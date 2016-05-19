@@ -8,13 +8,21 @@ namespace Battle_ST_Game {
 
 		public UnitStatus status;	//!<Unit status
 
+		protected Animator _animator; //!<Unit animator
+
+		protected SpriteRenderer _spriteRenderer; //!<Unit sprite renderer
+
 		public bool dead { get; protected set;}	//!<unit are dead
 
 		protected int placeNo;//!<１～６
 		protected Vector3 defaultPosition;	//!<Used to return at the start of the location
 
-		public class UnitStatus
-		{
+		protected CircleCollider2D _sightOfUnit; //!<Sight of unit
+
+		private const string UNIT_SPRITE_PATH = "Icons/f002";
+
+
+		public class UnitStatus {
 			public int unitNo;	//!<Unit id
 			public string name; //!<Unit name
 
@@ -33,11 +41,20 @@ namespace Battle_ST_Game {
 			public bool leader; //!<leader
 		}
 
+		void Awake() {
+
+
+			//get status
+//			if (status == null) return;
+
+
+		}
+
 		/** Member kind enum */
 		public enum MEMBER_KIND 
 		{
-			Player ,	//!<近接攻撃
-			Opponent ,	//!<遠距離攻撃
+			BOTTOM_SIDE ,	//!<Bottom
+			TOP_SIDE ,	//!<Top
 		}
 
 		/** Weapon kind enum */
@@ -50,6 +67,34 @@ namespace Battle_ST_Game {
 			MACHINE_GUN, //!<Machine Gun
 		}
 
+		/**
+		 * init unit 
+		 */ 
+		public void Initalize(UnitStatus status, int posIndex) {
+
+			this.status = status;
+			this.dead = false;
+
+			this.setUpComponents();
+
+		}
+
+		/**
+		 * setup other components for unit
+		 */ 
+		public void setUpComponents() {
+			if (!_animator) _animator = this.GetComponent<Animator>();
+			if (!_spriteRenderer) _spriteRenderer = this.GetComponent<SpriteRenderer>();
+
+			Sprite sp = Resources.Load(UNIT_SPRITE_PATH) as Sprite;
+
+			if (sp) _spriteRenderer.sprite = sp;
+			
+			//setup sight
+			if (!_sightOfUnit) _sightOfUnit = this.gameObject.GetComponentInChildren<CircleCollider2D>();
+			//			_sightOfUnit.radius = this.status.rangeAttack;
+			_sightOfUnit.radius = 5;
+		}
 		/**
 		 * Find nearest Enemy to attack
 		 * 
