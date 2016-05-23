@@ -19,7 +19,6 @@ public class Tower : MonoBehaviour {
 
 		}
 
-		Debug.Log("tag: "+other.tag);
 
 	}
 

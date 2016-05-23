@@ -25,19 +25,19 @@ namespace Battle_ST_Game {
 		private const string BATTLE_BOTTOM_AREA_PATH = "BattleArea/Bottom_Formation";
 
 		private Vector3[] _bottomUnitPositions = new Vector3[5] { 
-			new Vector3(-9f,0f,0f),       //!<1 
-			new Vector3(-5f,0f,0f),      //!<2 
+			new Vector3(-8f,0f,0f),       //!<1 
+			new Vector3(-4f,0f,0f),      //!<2 
 			new Vector3(0f,0f,0f),        //!<3 
-			new Vector3(5f,0f,0f),      //!<4 
-			new Vector3(9f,0f,0f),        //!<5 
+			new Vector3(4f,0f,0f),      //!<4 
+			new Vector3(8f,0f,0f),        //!<5 
 		};
 
 		private Vector3[] _topUnitPositions = new Vector3[5] { 
-			new Vector3(-9f,0f,0f),       //!<1 
-			new Vector3(-5f,0f,0f),      //!<2 
+			new Vector3(-8f,0f,0f),       //!<1 
+			new Vector3(-4f,0f,0f),      //!<2 
 			new Vector3(0f,0f,0f),        //!<3 
-			new Vector3(5f,0f,0f),      //!<4 
-			new Vector3(9f,0f,0f),        //!<5 
+			new Vector3(4f,0f,0f),      //!<4 
+			new Vector3(8f,0f,0f),        //!<5 
 		};
 
 		/** Game state */
@@ -68,7 +68,7 @@ namespace Battle_ST_Game {
 			//make game start
 			instance.gameState = GAME_STATE.PLAYING;
 
-			_bottomUnits[0].SendMessage("goTo", BattleManager.instance._topUnits[0].gameObject);
+//			_bottomUnits[0].SendMessage("goTo", BattleManager.instance._topUnits[0].gameObject);
 		}
 		
 		public void Initalize() {
@@ -87,11 +87,11 @@ namespace Battle_ST_Game {
 			for(int i = 0; i< 5; i++) {
 				Battle_ST_Game.Unit.UnitStatus stt = new Unit.UnitStatus();
 				stt.unitNo = Random.Range(1, 7); 
-				stt.maxHp = 400;
+				stt.maxHp = Random.Range(200, 400);
 				stt.hp = stt.maxHp;
 				stt.mana = 10;
-				stt.attack = Random.Range(10, 150);
-				stt.def = Random.Range(5, 55);
+				stt.attack = Random.Range(15, 100);
+				stt.def = Random.Range(5, 25);
 				stt.leader = false;
 
 				stt.weaponKind = getWeaponKindFrom(stt.unitNo);
@@ -106,11 +106,11 @@ namespace Battle_ST_Game {
 //				Battle_ST_Game.Unit unit = new Unit();
 				Battle_ST_Game.Unit.UnitStatus stt = new Unit.UnitStatus();
 				stt.unitNo = Random.Range(1, 7); 
-				stt.maxHp = 400;
+				stt.maxHp = Random.Range(200, 400);
 				stt.hp = stt.maxHp;
 				stt.mana = 10;
 				stt.attack = Random.Range(10, 150);
-				stt.def = Random.Range(5, 55);
+				stt.def = Random.Range(5, 25);
 				stt.leader = false;
 
 				stt.weaponKind = getWeaponKindFrom(stt.unitNo);
@@ -191,22 +191,22 @@ namespace Battle_ST_Game {
 		 * Get range attack from weapo kind
 		 */ 
 		public static float getRangeAttackFrom(Unit.WEAPON_KIND kind) {
-			float result = 1;
+			float result = 5;
 			switch(kind) {
 			case Unit.WEAPON_KIND.AXE:
-				result = 1;
+				result = 5;
 				break;
 			case Unit.WEAPON_KIND.HAMMER:
-				result = 2;
+				result = 5;
 				break;
 			case Unit.WEAPON_KIND.SWORD:
-				result = 3;
+				result = 6;
 				break;
 			case Unit.WEAPON_KIND.RIFLE:
-				result = 5.5f;
+				result = 8.5f;
 				break;
 			case Unit.WEAPON_KIND.MACHINE_GUN:
-				result = 7;
+				result = 9;
 				break;
 			default:
 				break;

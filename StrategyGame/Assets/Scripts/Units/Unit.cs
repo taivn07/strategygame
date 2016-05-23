@@ -30,6 +30,11 @@ namespace Battle_ST_Game {
 		private string enemyTag = "";
 		private Unit nowTarget = null;
 
+		private bool attackable = false;
+
+		private float lastTimeShooted = 0;
+		public int ShootIntervalInSeconds = 0;
+
 		public class UnitStatus {
 			public int unitNo;	//!<Unit id
 			public string name; //!<Unit name
@@ -93,9 +98,9 @@ namespace Battle_ST_Game {
 
 			if (sp) _spriteRenderer.sprite = sp;
 			
-			//setup sight
-			if (!_sightOfUnit) _sightOfUnit = this.gameObject.GetComponentInChildren<CircleCollider2D>();
-			_sightOfUnit.radius = this.status.rangeAttack;
+//			//setup sight
+//			if (!_sightOfUnit) _sightOfUnit = this.gameObject.GetComponentInChildren<CircleCollider2D>();
+//			_sightOfUnit.radius = this.status.rangeAttack;
 
 			if (this.status.memberKind == MEMBER_KIND.BOTTOM_SIDE) {
 				this.gameObject.tag = BOTTOM_TAG;
@@ -105,6 +110,13 @@ namespace Battle_ST_Game {
 				this.gameObject.tag = TOP_TAG;
 				enemyTag = BOTTOM_TAG;
 			}
+
+			//add health bar
+//			this.gameObject.AddComponent("HealthBar");
+			HealthBar hBar = (HealthBar) this.gameObject.AddComponent(typeof(HealthBar));
+			hBar.curHealth = this.status.hp;
+			hBar.maxHealth = this.status.maxHp;
+
 
 		}
 
@@ -129,7 +141,7 @@ namespace Battle_ST_Game {
 
 			foreach(Unit enemy in units) {
 				var distance = Vector3.Distance(enemy.transform.position, this.transform.position);
-				if (distance < this.status.rangeAttack) {
+				if (distance - this.GetComponent<SpriteRenderer>().bounds.size.x/2 < this.status.rangeAttack && !enemy.dead) {
 					target = enemy;
 					break;
 				}
@@ -146,6 +158,28 @@ namespace Battle_ST_Game {
 		 */ 
 		protected void attackEnemy(UnitStatus playerStatus, UnitStatus enemyStatus) {
 
+			//range attack
+			if (this.status.weaponKind == WEAPON_KIND.MACHINE_GUN || this.status.weaponKind == WEAPON_KIND.RIFLE) {
+				if  ((lastTimeShooted + ShootIntervalInSeconds) < Time.time) {
+
+					//animation here
+
+
+					GameObject loadedResource = Resources.Load<GameObject>("Prefabs/Bullet");
+					GameObject newInstance = GameObject.Instantiate<GameObject>(loadedResource);
+					newInstance.transform.position = this.transform.position;
+					Bullet bullet = newInstance.GetComponent<Bullet>();
+					bullet.Target = this.nowTarget.gameObject;
+					bullet.tag = this.gameObject.tag +"_Bullet";
+					bullet.damage = this.status.attack;
+					lastTimeShooted = Time.time;
+				}
+			} else { //normal attack
+				//animation here
+
+			}
+
+
 		}
 
 		private void goTo(GameObject target) {
@@ -159,18 +193,18 @@ namespace Battle_ST_Game {
 		}
 
 		void Update() {
-//			if (BattleManager.instance.gameState != BattleManager.GAME_STATE.PLAYING) return;
-//
-//			nowTarget = findNearestEnemy();
-//
-//			//Attack tartget
-//			if (nowTarget != null) { 
-//				//Attack
-//				attackEnemy(this.status, nowTarget.status);
-//			} else {
-//				//Keep move and find them
-//
-//			}
+			if (BattleManager.instance.gameState != BattleManager.GAME_STATE.PLAYING || this.dead) return;
+
+			nowTarget = findNearestEnemy();
+
+			//Attack tartget
+			if (nowTarget != null) { 
+				//Attack
+				attackEnemy(this.status, nowTarget.status);
+			} else {
+				//Keep move and find them
+
+			}
 		}
 
 
@@ -179,29 +213,26 @@ namespace Battle_ST_Game {
 		 */ 
 		void OnTriggerEnter2D (Collider2D other) {
 			
-			if(other.gameObject.tag == enemyTag) {
-				
+			if(other.gameObject.tag == enemyTag+"_Bullet") {
+				this.status.hp = (int)(this.status.hp - other.GetComponent<Bullet>().damage + this.status.def);
+				Debug.Log(other.GetComponent<Bullet>().damage);
+				if (this.status.hp <= 0) {
+					this.status.hp = 0;
+					this.dead = true;
+					this.gameObject.SetActive(false);
+				}
+				this.GetComponent<HealthBar>().curHealth = this.status.hp;
+				Destroy(other.gameObject);
 			}
-			
-			Debug.Log("tag: "+other.tag);
 			
 		}
 
 		void OnTriggerStay2D (Collider2D other) {
-			
-			if(other.gameObject.tag == enemyTag) {
-				
-			}
-			
-			Debug.Log("tag: "+other.tag);
+
 			
 		}
 
 		void OnTriggerExit2D (Collider2D other) {
-			
-			if(other.gameObject.tag == enemyTag) {
-				
-			}
 			
 		}
 
